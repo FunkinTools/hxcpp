@@ -1,5 +1,7 @@
-<project name="hxcpp" url="http://gamehaxe.com/" license="BSD">
+<project name="hxcpp" url="https://github.com/FunkinTools/hxcpp/" license="BSD">
+    <user name="FunkinTools"/>
     <user name="gamehaxe"/>
-    <description>Hxcpp is the runtime support for the c++ backend of the haxe compiler.  This release constains the headers, libraries and support code required to generate a fully compiled executable from haxe code.</description>
-<version name="3.1.0">See Changes.txt</version>
+    <user name="HaxeFoundation"/>
+    <description>A Hxcpp focused on Friday Night Funkin'. Runtime support for the C++ backend of the Haxe compiler, containing headers, libraries and support code required to generate a fully compiled executable from Haxe code.</description>
+    <version name="0.1.0">Initial FunkinTools release based on hxcpp 4.3.0.</version>
 </project>
