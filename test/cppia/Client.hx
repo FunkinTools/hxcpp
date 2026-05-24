@@ -1,269 +1,269 @@
 class ClientOne implements pack.HostInterface
 {
-   public function new() { }
-   public function getOne() : Int return 1;
-   public function getOneString() : String return "1";
-}
-
-class ClientFoo implements IFoo {
-
    public function new() {}
 
-   public function baz():String {
-       return 'foo';
-   }
+   public function getOne():Int
+      return 1;
+
+   public function getOneString():String
+      return "1";
+}
+
+class ClientFoo implements IFoo
+{
+   public function new() {}
+
+   public function baz():String
+      return "foo";
 }
 
 class Client
 {
-   public static var clientBool0 = true;
-   public static var clientBool1 = false;
-   public static var clientBool2 = true;
-   public static var clientBool3 = false;
+   public static var clientBool0:Bool = true;
+   public static var clientBool1:Bool = false;
+   public static var clientBool2:Bool = true;
+   public static var clientBool3:Bool = false;
 
-   public static function main()
+   static function fail(message:String):Void
+   {
+      Common.status = message;
+   }
+
+   static function checkSwitch(result:Dynamic, testName:String):Bool
+   {
+      switch result {
+         case Error(message):
+            fail('Failed $testName: $message');
+            return false;
+         default:
+            return true;
+      }
+   }
+
+   public static function main():Void
    {
       Common.status = "running";
 
-      // See if it compiles
-      if (sys.thread.Thread.current()==null)
+      if (sys.thread.Thread.current() == null)
       {
-         Common.status = "Cppia Thread.current not working.";
+         fail("Cppia Thread.current not working.");
          return;
       }
 
-      if (Common.hostImplementation.getOne()!=1)
-      {
-         Common.status = "Bad call to getOne";
-         return;
-      }
-      if (Common.hostImplementation.getOneString()!="1")
-      {
-         Common.status = "Bad call to getOneString";
-         return;
-      }
+      if (!validateHostImplementation())  return;
+      if (!validateClientExtends())       return;
+      if (!validateInterfaces())          return;
+      if (!validateClientIHostImpl())     return;
+      if (!validateClientExtends2())      return;
+      if (!validateBoolRepresentation())  return;
+      if (!validateLocalFunctionExceptions()) return;
+      if (!validateReturnExpressions())   return;
+      if (!validateRegressions())         return;
 
-      var c = new ClientExtends();
+      final extending = new ClientExtendedExtendedRoot();
+      extending.addValue();
+
+      Common.clientRoot           = extending;
+      Common.clientImplementation = new ClientOne();
+      Common.status               = "ok";
+      Common.callback             = () -> Common.callbackSet = 2;
+   }
+
+   static function validateHostImplementation():Bool
+   {
+      if (Common.hostImplementation.getOne() != 1)
+      {
+         fail("Bad call to getOne");
+         return false;
+      }
+      if (Common.hostImplementation.getOneString() != "1")
+      {
+         fail("Bad call to getOneString");
+         return false;
+      }
+      return true;
+   }
+
+   static function validateClientExtends():Bool
+   {
+      final c = new ClientExtends();
+
       if (!c.ok())
       {
-         Common.status = "Bad client extension";
-         return;
+         fail("Bad client extension");
+         return false;
       }
-      if (c.whoStartedYou()!="HostBase")
+      if (c.whoStartedYou() != "HostBase")
       {
-         Common.status = "Bad class fallthrough - got " + c.whoStartedYou();
-         return;
+         fail("Bad class fallthrough - got " + c.whoStartedYou());
+         return false;
       }
-      if (c.whoOverridesYou()!="ClientExtends")
+      if (c.whoOverridesYou() != "ClientExtends")
       {
-         Common.status = "Bad class override - got " + c.whoOverridesYou();
-         return;
+         fail("Bad class override - got " + c.whoOverridesYou());
+         return false;
       }
       if (!c.testPointers())
       {
-         Common.status = "Could not move native pointers";
-         return;
+         fail("Could not move native pointers");
+         return false;
       }
-
-      var hostInterface:IHostInterface = c;
-      if (hostInterface.whoStartedYou()!="HostBase")
-      {
-         Common.status = "Bad interface fallthrough";
-         return;
-      }
-      if (hostInterface.whoOverridesYou()!="ClientExtends")
-      {
-         Common.status = "Bad interface override";
-         return;
-      }
-      if (hostInterface.hostImplOnly(1,"two",3)!="1two3")
-      {
-         Common.status = "Bad hostImplOnly implementation";
-         return;
-      }
-
       if (!c.testOne())
       {
-         Common.status = "Bad ClientExtends getOne";
-         return;
+         fail("Bad ClientExtends getOne");
+         return false;
       }
+      return true;
+   }
 
+   static function validateInterfaces():Bool
+   {
+      final c = new ClientExtends();
 
-
-      var clientInterface:IClientInterface = c;
-      if (clientInterface.whoStartedYou()!="HostBase")
+      final hostInterface:IHostInterface = c;
+      if (hostInterface.whoStartedYou() != "HostBase")
       {
-         Common.status = "Bad client interface fallthrough";
-         return;
+         fail("Bad interface fallthrough");
+         return false;
       }
-      if (clientInterface.uniqueClientFunc()!="uniqueClientFunc")
+      if (hostInterface.whoOverridesYou() != "ClientExtends")
       {
-         Common.status = "Bad new client interface call";
-         return;
+         fail("Bad interface override");
+         return false;
       }
-
-      if (clientInterface.whoOverridesYou()!="ClientExtends")
+      if (hostInterface.hostImplOnly(1, "two", 3) != "1two3")
       {
-         Common.status = "Bad client interface override";
-         return;
+         fail("Bad hostImplOnly implementation");
+         return false;
       }
 
-      var clientHostInterface:IClientHostInterface = c;
-      if (clientHostInterface.whoStartedYou()!="HostBase")
+      final clientInterface:IClientInterface = c;
+      if (clientInterface.whoStartedYou() != "HostBase")
       {
-         Common.status = "Bad client interface fallthrough";
-         return;
+         fail("Bad client interface fallthrough");
+         return false;
       }
-      if (clientHostInterface.whoOverridesYou()!="ClientExtends")
+      if (clientInterface.uniqueClientFunc() != "uniqueClientFunc")
       {
-         Common.status = "Bad client interface override";
-         return;
+         fail("Bad new client interface call");
+         return false;
       }
-      if (clientHostInterface.whoAreYou()!="ClientExtends")
+      if (clientInterface.whoOverridesYou() != "ClientExtends")
       {
-         Common.status = "Bad client/host interface";
-         return;
+         fail("Bad client interface override");
+         return false;
       }
 
-      var c:ClientIHostImpl = new ClientIHostImpl();
-      if (c.hostImplOnly(0,null,0)!="client" || c.whoStartedYou()!="client" || c.whoOverridesYou()!="client")
+      final clientHostInterface:IClientHostInterface = c;
+      if (clientHostInterface.whoStartedYou() != "HostBase")
       {
-         Common.status = "Trouble implementing host interface";
-         return;
+         fail("Bad client/host interface fallthrough");
+         return false;
       }
-
-      var c:ClientExtends = new ClientExtends2();
-      if (c.getGeneration()!=2)
+      if (clientHostInterface.whoOverridesYou() != "ClientExtends")
       {
-         Common.status = "Error calling cppia super function";
-         return;
+         fail("Bad client/host interface override");
+         return false;
       }
-
-      var c = new ClientExtends2();
-      if (c.testOne())
+      if (clientHostInterface.whoAreYou() != "ClientExtends")
       {
-         Common.status = "ClientExtends2 getOne should fail";
-         return;
+         fail("Bad client/host interface whoAreYou");
+         return false;
       }
+      return true;
+   }
 
-      if (!c.testOneExtended())
+   static function validateClientIHostImpl():Bool
+   {
+      final c = new ClientIHostImpl();
+      if (c.hostImplOnly(0, null, 0) != "client"
+       || c.whoStartedYou()    != "client"
+       || c.whoOverridesYou()  != "client")
       {
-         Common.status = "ClientExtends2 testOneExtended failed";
-         return;
+         fail("Trouble implementing host interface");
+         return false;
       }
+      return true;
+   }
 
-      if (!c.testFour())
+   static function validateClientExtends2():Bool
+   {
+      final c1:ClientExtends = new ClientExtends2();
+      if (c1.getGeneration() != 2)
       {
-         Common.status = "ClientExtends2 testFour error";
-         return;
+         fail("Error calling cppia super function");
+         return false;
       }
 
-
-
-      var hostBools = HostBase.hostBool0 + "/" + HostBase.hostBool1+ "/" + HostBase.hostBool2+ "/" + HostBase.hostBool3;
-      var clientBools = clientBool0 + "/" + clientBool1+ "/" + clientBool2+ "/" + clientBool3;
-      if (hostBools!=clientBools)
+      final c2 = new ClientExtends2();
+      if (c2.testOne())
       {
-         Common.status = "Error in bool representation:" + hostBools + "!=" + clientBools;
-         return;
+         fail("ClientExtends2 getOne should fail");
+         return false;
       }
-
-      switch LocalFunctionExceptions.testLocalCallingStatic() {
-         case Error(message):
-            Common.status = 'Failed test for throw in static called by local: ' + message;
-            return;
-         default:
+      if (!c2.testOneExtended())
+      {
+         fail("ClientExtends2 testOneExtended failed");
+         return false;
       }
-
-      switch LocalFunctionExceptions.testCatchWithinLocal() {
-         case Error(message):
-            Common.status = 'Failed test for catch in local function: ' + message;
-            return;
-         default:
+      if (!c2.testFour())
+      {
+         fail("ClientExtends2 testFour error");
+         return false;
       }
+      return true;
+   }
 
-      switch LocalFunctionExceptions.testCatchFromLocal() {
-         case Error(message):
-            Common.status = 'Failed test for catching exception from local function: ' + message;
-            return;
-         default:
+   static function validateBoolRepresentation():Bool
+   {
+      final hostBools   = '${HostBase.hostBool0}/${HostBase.hostBool1}/${HostBase.hostBool2}/${HostBase.hostBool3}';
+      final clientBools = '$clientBool0/$clientBool1/$clientBool2/$clientBool3';
+
+      if (hostBools != clientBools)
+      {
+         fail('Error in bool representation: $hostBools != $clientBools');
+         return false;
       }
+      return true;
+   }
 
-      switch LocalFunctionExceptions.testObjMethodOnReturn() {
-         case Error(message):
-            Common.status = 'Failed test for running object method on returned value: ' + message;
-            return;
-         default:
-      }
+   static function validateLocalFunctionExceptions():Bool
+   {
+      if (!checkSwitch(LocalFunctionExceptions.testLocalCallingStatic(),    "throw in static called by local"))    return false;
+      if (!checkSwitch(LocalFunctionExceptions.testCatchWithinLocal(),      "catch in local function"))            return false;
+      if (!checkSwitch(LocalFunctionExceptions.testCatchFromLocal(),        "catching exception from local"))      return false;
+      if (!checkSwitch(LocalFunctionExceptions.testObjMethodOnReturn(),     "object method on returned value"))    return false;
+      if (!checkSwitch(LocalFunctionExceptions.testClassMethodOnReturn(),   "class method on returned value"))     return false;
+      if (!checkSwitch(LocalFunctionExceptions.testHostClassMethodOnHostReturn(), "host class method on host return")) return false;
+      return true;
+   }
 
-      switch LocalFunctionExceptions.testClassMethodOnReturn() {
-         case Error(message):
-            Common.status = 'Failed test for running class method on returned value: ' + message;
-            return;
-         default:
-      }
+   static function validateReturnExpressions():Bool
+   {
+      if (!checkSwitch(ReturnExpressions.testHostThisReturn(),   "host this return stopping argument evaluation")) return false;
+      if (!checkSwitch(ReturnExpressions.testHostArgReturn(),    "argument return stopping argument evaluation"))  return false;
+      if (!checkSwitch(ReturnExpressions.testClientThisReturn(), "client this return stopping evaluation"))        return false;
+      if (!checkSwitch(ReturnExpressions.testFuncReturn(),       "function value return stopping evaluation"))     return false;
+      return true;
+   }
 
-      switch LocalFunctionExceptions.testHostClassMethodOnHostReturn() {
-         case Error(message):
-            Common.status = 'Failed test for running host class method on returned value: ' + message;
-            return;
-         default:
-      }
-
-		switch ReturnExpressions.testHostThisReturn() {
-         case Error(message):
-            Common.status = 'Failed test for host this return stopping argument evaluation: ' + message;
-            return;
-         default:
-      }
-
-		switch ReturnExpressions.testHostArgReturn() {
-			case Error(message):
-				Common.status = 'Failed test for argument return stopping argument evaluation: ' + message;
-				return;
-			default:
-		}
-
-		switch ReturnExpressions.testClientThisReturn() {
-			case Error(message):
-				Common.status = 'Failed test for client this return stopping evaluation: ' + message;
-				return;
-			default:
-		}
-
-		switch ReturnExpressions.testFuncReturn() {
-			case Error(message):
-				Common.status = 'Failed test for function value return stopping evaluation: ' + message;
-				return;
-			default:
-		}
-
-      // regression test for #926
+   static function validateRegressions():Bool
+   {
       var x:Dynamic = 3;
       x *= 5;
-      if (x != 15) {
-         Common.status = 'Failed regression test for #926. x: $x';
-         return;
+      if (x != 15)
+      {
+         fail('Failed regression #926: x = $x');
+         return false;
       }
 
-      // regression test for #1257
-      var x = 1290555;
-      x *= 1290555;
-      if (x != -915102823) {
-         Common.status = 'Failed regression test for #1257. x: $x';
-         return;
+      var y:Int = 1290555;
+      y *= 1290555;
+      if (y != -915102823)
+      {
+         fail('Failed regression #1257: y = $y');
+         return false;
       }
-
-      final extending = new ClientExtendedExtendedRoot();
-
-      extending.addValue();
-
-      Common.clientRoot = extending;
-
-
-      Common.clientImplementation = new ClientOne();
-      Common.status = "ok";
-
-      Common.callback = () -> Common.callbackSet = 2;
+      return true;
    }
 }
