@@ -1,14 +1,12 @@
 {
   "name": "hxcpp",
-  "url": "https://github.com/HaxeFoundation/hxcpp/",
+  "url": "https://github.com/FunkinTools/hxcpp/",
   "license": "BSD",
-  "tags": ["haxe", "hxcpp", "cpp"],
-  "description": "Hxcpp is the runtime support for the C++ backend of the Haxe compiler. This contains the headers, libraries and support code required to generate a fully compiled executable from Haxe code.",
-  "version": "4.3.0",
-  "releasenote": "See Changes.md",
-  "contributors": ["gamehaxe", "HaxeFoundation"],
+  "tags": ["haxe", "hxcpp", "cpp", "fnf", "friday-night-funkin"],
+  "description": "A Hxcpp focused on Friday Night Funkin'.",
+  "version": "0.1.0",
+  "releasenote": "Initial FunkinTools release based on hxcpp 4.3.0.",
+  "contributors": ["FunkinTools", "gamehaxe", "HaxeFoundation"],
   "binaryversion": 48,
-  "dependencies": {
-
-  }
+  "dependencies": {}
 }
