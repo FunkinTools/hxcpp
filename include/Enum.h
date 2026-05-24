@@ -1,158 +1,143 @@
 #ifndef HX_ENUM_H
 #define HX_ENUM_H
 
+#ifndef HXCPP_H
+   #error "Please include hxcpp.h, not hx/Enum.h directly"
+#endif
 
-
-// Enum (ie enum object class def)  is the same as Class.
 typedef hx::Class Enum;
-
 
 namespace hx
 {
 
-// --- hx::EnumBase_obj ----------------------------------------------------------
-//
-// Base class for Enums.
-// Specializations of this class don't actually add more data, just extra constructors
-//  and type information.
-
 class HXCPP_EXTERN_CLASS_ATTRIBUTES EnumBase_obj : public hx::Object
 {
-   typedef hx::Object super;
-   typedef EnumBase_obj OBJ_;
+   typedef hx::Object      super;
+   typedef EnumBase_obj    OBJ_;
 
+protected:
+   String   _hx_tag;
+   int      mFixedFields;
 
-   protected:
-      String  _hx_tag;
-      int     mFixedFields;
-      #ifdef HXCPP_SCRIPTABLE
-      struct CppiaClassInfo *classInfo; 
+   #ifdef HXCPP_SCRIPTABLE
+   struct CppiaClassInfo *classInfo;
+   #endif
+
+public:
+   HX_IS_INSTANCE_OF enum { _hx_ClassId = hx::clsIdEnum };
+
+   int index;
+
+   inline void *operator new(size_t inSize, int inExtra = 0) noexcept
+   {
+      return hx::Object::operator new(inSize + inExtra, true, 0);
+   }
+   inline void operator delete(void *, int)             noexcept {}
+   inline void operator delete(void *, size_t)          noexcept {}
+   inline void operator delete(void *, size_t, int)     noexcept {}
+
+   HX_DO_ENUM_RTTI_INTERNAL;
+
+   static hx::ObjectPtr<hx::Class_obj> &__SGetClass();
+
+   EnumBase_obj() noexcept : index(-1), mFixedFields(0) {}
+   explicit EnumBase_obj(const null &) noexcept : index(-1), mFixedFields(0) {}
+
+   int    __GetType()  const override { return vtEnum; }
+   String toString()   const;
+   String GetEnumName()const override { return HX_CSTRING("Enum"); }
+
+   static Dynamic  __CreateEmpty();
+   static Dynamic  __Create(DynamicArray inArgs);
+   static void     __boot();
+
+   void __Mark(hx::MarkContext *__inCtx) override;
+
+   #ifdef HXCPP_VISIT_ALLOCS
+   void __Visit(hx::VisitContext *__inCtx) override;
+   #endif
+
+   static hx::ObjectPtr<EnumBase_obj> Resolve(const String &inName);
+
+   inline static bool __GetStatic(const ::String &, Dynamic &, hx::PropertyAccess) noexcept
+   {
+      return false;
+   }
+
+   inline cpp::Variant       *_hx_getFixed()       noexcept { return reinterpret_cast<cpp::Variant *>(this + 1); }
+   inline const cpp::Variant *_hx_getFixed() const noexcept { return reinterpret_cast<const cpp::Variant *>(this + 1); }
+
+   inline void _hx_setIdentity(const String &inTag, int inIndex, int inFixedFields) noexcept
+   {
+      _hx_tag      = inTag;
+      HX_OBJ_WB_GET(this, _hx_tag.__s);
+      index        = inIndex;
+      mFixedFields = inFixedFields;
+   }
+
+   template<typename T>
+   inline EnumBase_obj *_hx_init(int inIndex, const T &inValue)
+   {
+      cpp::Variant &v = _hx_getFixed()[inIndex];
+      v = inValue;
+      #ifdef HXCPP_GC_GENERATIONAL
+      if (v.type <= cpp::Variant::typeString)
+         HX_OBJ_WB_GET(this, v.valObject);
       #endif
-   public:
-      HX_IS_INSTANCE_OF enum { _hx_ClassId = hx::clsIdEnum };
+      return this;
+   }
 
-      int          index;
+   inline ::Dynamic     __Param(int inID)              { return _hx_getFixed()[inID]; }
+   inline ::Dynamic     _hx_getObject(int inId)        { return _hx_getFixed()[inId].asDynamic(); }
+   inline ::Dynamic     _hx_getParamI(int inId)        { return _hx_getFixed()[inId]; }
+   inline int           _hx_getInt(int inId)           { return _hx_getFixed()[inId]; }
+   inline ::cpp::Int64  _hx_getInt64(int inId)         { return _hx_getFixed()[inId].asInt64(); }
+   inline Float         _hx_getFloat(int inId)         { return _hx_getFixed()[inId]; }
+   inline bool          _hx_getBool(int inId)          { return _hx_getFixed()[inId]; }
+   inline ::String      _hx_getString(int inId)        { return _hx_getFixed()[inId].asString(); }
+   inline int           _hx_getParamCount()  const noexcept { return mFixedFields; }
 
-   public:
-      inline void *operator new( size_t inSize, int inExtra=0)
-      {
-         return hx::Object::operator new(inSize+inExtra, true, 0);
-      }
-      inline void operator delete(void *, int inExtra ) { }
-      inline void operator delete(void *, size_t inSize ) { }
-      inline void operator delete(void *, size_t inSize, int inExtra ) { }
+   DynamicArray _hx_getParameters();
+   Dynamic      __GetItem(int inIndex) const;
 
+   inline String _hx_getTag()   const noexcept { return _hx_tag; }
+   inline int    _hx_getIndex() const noexcept { return index;   }
+   inline String __Tag()        const noexcept { return _hx_tag; }
 
-      HX_DO_ENUM_RTTI_INTERNAL;
-      static hx::ObjectPtr<hx::Class_obj> &__SGetClass();
-
-
-      String toString();
-
-      EnumBase_obj() : index(-1) { }
-      EnumBase_obj(const null &inNull) : index(-1) { }
-      int __GetType() const { return vtEnum; }
-      static Dynamic __CreateEmpty();
-      static Dynamic __Create(DynamicArray inArgs);
-      static void __boot();
-
-      void __Mark(hx::MarkContext *__inCtx);
-      #ifdef HXCPP_VISIT_ALLOCS
-      void __Visit(hx::VisitContext *__inCtx);
-      #endif
-
-      static hx::ObjectPtr<EnumBase_obj> Resolve(String inName);
-      inline static bool __GetStatic(const ::String &inName, Dynamic &outValue, hx::PropertyAccess inCallProp) { return false; }
-
-      inline cpp::Variant *_hx_getFixed() { return (cpp::Variant *)(this + 1); }
-      inline const cpp::Variant *_hx_getFixed() const { return (cpp::Variant *)(this + 1); }
-      inline ::Dynamic __Param(int inID) { return _hx_getFixed()[inID]; }
-      template<typename T>
-      inline EnumBase_obj *_hx_init(int inIndex,const T &inValue)
-      {
-         #ifdef HXCPP_GC_GENERATIONAL
-         cpp::Variant &v = _hx_getFixed()[inIndex];
-         v = inValue;
-         if (v.type<=cpp::Variant::typeString)
-             HX_OBJ_WB_GET(this, v.valObject);
-         #else
-         _hx_getFixed()[inIndex] = inValue;
-         #endif
-         return this;
-      }
-      inline void _hx_setIdentity(const String &inTag, int inIndex,int inFixedFields)
-      {
-         _hx_tag = inTag;
-         HX_OBJ_WB_GET(this, _hx_tag.__s);
-         index = inIndex;
-         mFixedFields = inFixedFields;
-      }
-      DynamicArray _hx_getParameters();
-
-      inline ::Dynamic _hx_getObject(int inId) { return _hx_getFixed()[inId].asDynamic(); }
-      inline int _hx_getInt(int inId) { return _hx_getFixed()[inId]; }
-      inline ::cpp::Int64 _hx_getInt64(int inId) { return _hx_getFixed()[inId].asInt64(); }
-      inline Float _hx_getFloat(int inId) { return _hx_getFixed()[inId]; }
-      inline bool _hx_getBool(int inId) { return _hx_getFixed()[inId]; }
-      inline ::String _hx_getString(int inId) { return _hx_getFixed()[inId].asString(); }
-      inline ::Dynamic _hx_getParamI(int inId) { return _hx_getFixed()[inId]; }
-      inline int _hx_getParamCount() { return mFixedFields; }
-      // Alias for _hx_getParamI
-      Dynamic __GetItem(int inIndex) const;
-
-      // For legacy
-      inline String __Tag() const { return _hx_tag; }
-
-
-      String _hx_getTag() const { return _hx_tag; }
-      int _hx_getIndex() const { return index; }
-
-
-      int __Compare(const hx::Object *inRHS) const;
-
-      virtual String GetEnumName( ) const { return HX_CSTRING("Enum"); }
+   int __Compare(const hx::Object *inRHS) const override;
 };
-
 
 typedef hx::ObjectPtr<EnumBase_obj> EnumBase;
 
-
-HXCPP_EXTERN_CLASS_ATTRIBUTES bool __hxcpp_enum_eq( ::hx::EnumBase a,  ::hx::EnumBase b);
-
-// --- CreateEnum -------------------------------------------------------------
-//
-// Template function to return a strongly-typed version fo the Enum.
-// Most of the common stuff is in "Set".
+HXCPP_EXTERN_CLASS_ATTRIBUTES bool __hxcpp_enum_eq(::hx::EnumBase a, ::hx::EnumBase b);
 
 template<typename ENUM>
-ENUM *CreateEnum(const String &inName,int inIndex, int inFields)
+inline ENUM *CreateEnum(const String &inName, int inIndex, int inFields)
 {
-   ENUM *result = new (inFields*sizeof(cpp::Variant)) ENUM;
-   result->_hx_setIdentity(inName,inIndex,inFields);
+   ENUM *result = new(inFields * sizeof(cpp::Variant)) ENUM;
+   result->_hx_setIdentity(inName, inIndex, inFields);
    return result;
 }
 
 template<typename ENUM>
-ENUM *CreateConstEnum(const String &inName,int inIndex)
+inline ENUM *CreateConstEnum(const String &inName, int inIndex)
 {
    ENUM vtable;
-   ENUM *result = (ENUM *)hx::InternalCreateConstBuffer(&vtable,sizeof(ENUM));
-   result->_hx_setIdentity(inName,inIndex,0);
+   ENUM *result = static_cast<ENUM *>(hx::InternalCreateConstBuffer(&vtable, sizeof(ENUM)));
+   result->_hx_setIdentity(inName, inIndex, 0);
    return result;
 }
 
-} // end namespace hx
+}
 
-inline int _hx_getEnumValueIndex(hx::EnumBase inEnum)
+inline int _hx_getEnumValueIndex(hx::EnumBase inEnum) noexcept
 {
    return inEnum->_hx_getIndex();
 }
 
-inline void __hxcpp_enum_force(hx::EnumBase inEnum,String inForceName, int inIndex)
+inline void __hxcpp_enum_force(hx::EnumBase inEnum, String inForceName, int inIndex) noexcept
 {
-   inEnum->_hx_setIdentity(inForceName, inIndex,0);
+   inEnum->_hx_setIdentity(inForceName, inIndex, 0);
 }
-
-
 
 #endif
